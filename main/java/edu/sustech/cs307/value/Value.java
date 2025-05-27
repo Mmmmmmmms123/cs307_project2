@@ -31,7 +31,7 @@ public class Value {
 
     /**
      * 将当前值转换为字节数组。
-     * 
+     *
      * @return 字节数组表示的值，根据值的类型（INTEGER、FLOAT、CHAR）进行转换。
      * @throws RuntimeException 如果值的类型不受支持。
      */
@@ -47,13 +47,7 @@ public class Value {
                 buffer2.putDouble((double) value);
                 yield buffer2.array();
             }
-            case CHAR -> {
-                String str = (String) value;
-                ByteBuffer buffer3 = ByteBuffer.allocate(64);
-                buffer3.putInt(str.length());
-                buffer3.put(str.getBytes());
-                yield buffer3.array();
-            }
+            case CHAR -> ((String) value).getBytes();
             default -> throw new RuntimeException("Unsupported value type: " + type);
         };
     }
@@ -76,13 +70,7 @@ public class Value {
                 ByteBuffer buffer2 = ByteBuffer.wrap(bytes);
                 yield new Value(buffer2.getDouble());
             }
-            case CHAR -> {
-                ByteBuffer buffer3 = ByteBuffer.wrap(bytes);
-                var length = buffer3.getInt();
-                // int is 4 byte
-                String s = new String(bytes, 4, length);
-                yield new Value(s);
-            }
+            case CHAR -> new Value(new String(bytes));
             default -> throw new RuntimeException("Unsupported value type: " + type);
         };
 
@@ -95,11 +83,7 @@ public class Value {
                 return this.value.toString();
             }
             case CHAR -> {
-                byte[] bytes = ((String) this.value).getBytes();
-                ByteBuffer buffer3 = ByteBuffer.wrap(bytes);
-                var length = buffer3.getInt();
-                // int is 4 byte
-                return new String(bytes, 4, length);
+                return (String) this.value;
             }
             default -> throw new RuntimeException("Unsupported value type: " + type);
         }

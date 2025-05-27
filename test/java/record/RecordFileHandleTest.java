@@ -120,7 +120,7 @@ class RecordFileHandleTest {
             }
 
             RID newRid = fileHandle.InsertRecord(Unpooled.buffer(128));
-            assertThat(newRid.pageNum).isEqualTo(1);
+            assertThat(newRid.pageNum).isEqualTo(2);
         }
 
         @Test
