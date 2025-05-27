@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+
 public class PhysicalPlanner {
     public static PhysicalOperator generateOperator(DBManager dbManager, LogicalOperator logicalOp) throws DBException {
         if (logicalOp instanceof LogicalTableScanOperator tableScanOperator) {
@@ -36,9 +37,9 @@ public class PhysicalPlanner {
             return handleInsert(dbManager, insertOperator);
         } else if (logicalOp instanceof LogicalUpdateOperator updateOperator) {
             return handleUpdate(dbManager, updateOperator);
-        }
-
-        else {
+        } else if (logicalOp instanceof LogicalDeleteOperator deleteOperator) {
+            return handleDelete(dbManager,deleteOperator);
+        } else {
             throw new DBException(ExceptionTypes.UnsupportedOperator(logicalOp.getClass().getSimpleName()));
         }
     }
@@ -108,7 +109,7 @@ public class PhysicalPlanner {
             for (int i = 0; i < logicalInsertOp.columns.size(); i++) {
                 String colName = logicalInsertOp.columns.get(i).getColumnName();
                 if (tableMeta.getColumnMeta(colName) == null) {
-                    throw new DBException(ExceptionTypes.ColumnDoseNotExist(colName));
+                    throw new DBException(ExceptionTypes.ColumnDoesNotExist(colName));
                 }
                 if (!tableMeta.columns_list.get(i).name.equals(colName)) {
                     throw new DBException(ExceptionTypes.InsertColumnNameMismatch());
@@ -194,5 +195,13 @@ public class PhysicalPlanner {
             throw new DBException(ExceptionTypes.InvalidSQL("INSERT", "Unsupported expression list"));
         }
         return new UpdateOperator(scanner, logicalUpdateOp.getTableName(), logicalUpdateOp.getColumns().get(0), logicalUpdateOp.getExpression());
+    }
+
+    private static PhysicalOperator handleDelete(DBManager dbManager, LogicalDeleteOperator logicalDeleteOp) throws DBException {
+
+        PhysicalOperator inputOp = generateOperator(dbManager,logicalDeleteOp.getChild() );
+
+        // 创建物理删除操作符
+        return new DeleteOperator(inputOp, logicalDeleteOp.getTableName(),logicalDeleteOp.getExpression());
     }
 }

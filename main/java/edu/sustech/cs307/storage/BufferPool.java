@@ -7,7 +7,7 @@ import java.util.*;
 /**
  * BufferPool 类实现了一个缓冲池，用于管理页面的缓存。
  * 它支持从磁盘读取页面、将页面写回磁盘、以及管理页面的固定和释放。
- * 
+ *
  * 主要功能包括：
  * - 从缓冲池获取页面（FetchPage）
  * - 取消页面的固定（unpin_page）
@@ -161,7 +161,7 @@ public class BufferPool {
 
     /**
      * 从缓冲池中删除指定位置的页面。
-     * 
+     *
      * @param position 要删除的页面的位置。
      * @return 如果成功删除页面则返回 true；如果页面被锁定或不存在则返回 false。
      * @throws DBException 如果在删除过程中发生数据库异常。
@@ -227,11 +227,11 @@ public class BufferPool {
 
     /**
      * 查找一个受害者页面以进行替换。
-     * 
+     *
      * 如果自由列表不为空，则从中移除并返回一个页面ID。
      * 否则，使用LRU替换算法选择一个页面ID。如果选择的页面是脏页，
      * 则将其刷新到磁盘。返回找到的页面ID。
-     * 
+     *
      * @return 被替换的页面ID，如果没有可替换的页面则返回-1。
      * @throws DBException 如果在查找或刷新页面时发生错误。
      */
@@ -252,7 +252,7 @@ public class BufferPool {
 
     /**
      * 更新指定页面的位置和状态。如果页面是脏页，则将其刷新到磁盘。
-     * 
+     *
      * @param page         要更新的页面对象
      * @param new_position 新的位置
      * @param frame_id     帧的标识符

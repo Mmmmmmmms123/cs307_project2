@@ -144,6 +144,8 @@ public class DBManager {
         if(file_folder.exists()) {
             deleteDirectory(file_folder);
         }
+//        recordManager.DeleteFile(table_name);
+
 
     }
 

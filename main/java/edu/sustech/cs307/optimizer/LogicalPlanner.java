@@ -40,6 +40,8 @@ public class LogicalPlanner {
             operator = handleInsert(dbManager, insertStmt);
         } else if (stmt instanceof Update updateStmt) {
             operator = handleUpdate(dbManager, updateStmt);
+        }else if (stmt instanceof Delete deleteStmt){
+            operator = handleDelete(dbManager,deleteStmt);
         }
         //todo: add condition of handleDelete
         // functional
@@ -112,6 +114,12 @@ public class LogicalPlanner {
         LogicalOperator root = new LogicalTableScanOperator(updateStmt.getTable().getName(), dbManager);
         return new LogicalUpdateOperator(root, updateStmt.getTable().getName(), updateStmt.getUpdateSets(),
                 updateStmt.getWhere());
+    }
+
+    private static LogicalOperator handleDelete(DBManager dbManager, Delete deleteStmt) throws DBException {
+        LogicalOperator root = new LogicalTableScanOperator(deleteStmt.getTable().getName(), dbManager);
+        return new LogicalDeleteOperator(root, deleteStmt.getTable().getName(),
+                deleteStmt.getWhere());
     }
 
 

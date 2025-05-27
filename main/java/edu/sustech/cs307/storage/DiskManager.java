@@ -18,7 +18,7 @@ import org.pmw.tinylog.Logger;
 /**
  * 磁盘管理器类，用于管理文件的读写和元数据的存储。
  * 提供创建文件、读取页面、写入页面、分配页面和删除文件等功能。
- * 
+ *
  * <p>
  * 该类支持从磁盘读取和写入文件，并维护文件的页面信息。
  * </p>
@@ -122,7 +122,7 @@ public class DiskManager {
 
         // 使用 RandomAccessFile 和 FileChannel 来定位并写入数据
         try (RandomAccessFile raf = new RandomAccessFile(real_path, "rw");
-                FileChannel channel = raf.getChannel()) {
+             FileChannel channel = raf.getChannel()) {
             // 定位到对应的文件偏移位置
             channel.position(page.position.offset);
             // 使用 ByteBuffer.wrap 避免额外的数据拷贝
@@ -145,10 +145,10 @@ public class DiskManager {
 
     /**
      * 创建一个新文件。
-     * 
+     *
      * @param filename 文件名
      * @throws DBException 如果文件创建失败或发生IO异常
-     * 
+     *
      *                     该方法会检查指定路径下是否已存在同名文件。如果不存在，则会尝试创建该文件及其上级目录。
      *                     如果创建过程中发生任何异常，将抛出DBException。
      */
@@ -185,20 +185,11 @@ public class DiskManager {
     public void DeleteFile(String filename) throws DBException {
         String real_path = currentDir + "/" + filename;
         File file = new File(real_path);
-
-        if (!file.exists()) {
-            Logger.warn("Tried to delete non-existent file: {}", real_path);
-            return;
+        if (file.exists()) {
+            if (!file.delete()) {
+                throw new DBException(ExceptionTypes.BadIOError("File deletion failed: " + real_path));
+            }
+            this.filePages.remove(filename);
         }
-
-        if (!file.delete()) {
-            Logger.error("Failed to delete file: {}. It may be locked or in use.", real_path);
-            file.deleteOnExit();  // 安全兜底
-            throw new DBException(ExceptionTypes.BadIOError("File deletion failed: " + real_path));
-        }
-
-        // 移除 filePages 缓存
-        filePages.remove(filename);
     }
-
 }

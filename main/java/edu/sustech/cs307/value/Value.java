@@ -47,7 +47,13 @@ public class Value {
                 buffer2.putDouble((double) value);
                 yield buffer2.array();
             }
-            case CHAR -> ((String) value).getBytes();
+            case CHAR -> {
+                String str = (String) value;
+                ByteBuffer buffer3 = ByteBuffer.allocate(64);
+                buffer3.putInt(str.length());
+                buffer3.put(str.getBytes());
+                yield buffer3.array();
+            }
             default -> throw new RuntimeException("Unsupported value type: " + type);
         };
     }
@@ -70,7 +76,13 @@ public class Value {
                 ByteBuffer buffer2 = ByteBuffer.wrap(bytes);
                 yield new Value(buffer2.getDouble());
             }
-            case CHAR -> new Value(new String(bytes));
+            case CHAR -> {
+                ByteBuffer buffer3 = ByteBuffer.wrap(bytes);
+                var length = buffer3.getInt();
+                // int is 4 byte
+                String s = new String(bytes, 4, length);
+                yield new Value(s);
+            }
             default -> throw new RuntimeException("Unsupported value type: " + type);
         };
 
@@ -83,7 +95,11 @@ public class Value {
                 return this.value.toString();
             }
             case CHAR -> {
-                return (String) this.value;
+                byte[] bytes = ((String) this.value).getBytes();
+                ByteBuffer buffer3 = ByteBuffer.wrap(bytes);
+                var length = buffer3.getInt();
+                // int is 4 byte
+                return new String(bytes, 4, length);
             }
             default -> throw new RuntimeException("Unsupported value type: " + type);
         }

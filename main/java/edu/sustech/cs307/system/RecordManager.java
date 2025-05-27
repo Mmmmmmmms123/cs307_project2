@@ -12,7 +12,6 @@ import edu.sustech.cs307.storage.PagePosition;
 
 /**
  * 记录管理器类，负责管理数据库记录的创建、删除和文件操作。
- * 
  * 该类提供了创建文件、删除文件、打开文件和关闭文件的方法，确保记录的大小在有效范围内，并处理与磁盘和缓冲池的交互。
  */
 public class RecordManager {
@@ -41,7 +40,7 @@ public class RecordManager {
         diskManager.ReadPage(page, filename, 0, Page.DEFAULT_PAGE_SIZE);
         RecordFileHeader recordFileHeader = new RecordFileHeader(page.data);
         recordFileHeader.setRecordSize(record_size);
-        recordFileHeader.setNumberOfPages(1);
+        recordFileHeader.setNumberOfPages(0);
         recordFileHeader.setFirstFreePage(RecordPageHeader.NO_NEXT_FREE_PAGE);
         recordFileHeader.setNumberOfRecordsPrePage(
                 (8 * (Page.DEFAULT_PAGE_SIZE - RecordPageHeader.SIZE) / (1 + record_size * 8)));

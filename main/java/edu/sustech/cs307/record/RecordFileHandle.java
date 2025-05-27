@@ -93,7 +93,7 @@ public class RecordFileHandle {
      * @return 插入记录的 RID（记录标识符）
      * @throws DBException      数据库异常
      * @throws RuntimeException 如果文件损坏，抛出运行时异常
-     *
+
      *                          此方法首先创建一个记录页面句柄，并查找可以插入记录的槽位。如果没有可用的槽位，抛出异常。然后，将字节缓冲区中的数据写入找到的槽位，
      *                          并更新位图和页面头信息。如果页面已满，更新文件头以指向下一个空闲页面。最后，解除页面的固定状态并返回新插入记录的RID。
      */
@@ -172,7 +172,6 @@ public class RecordFileHandle {
 
     /**
      * 创建一个新的记录页面句柄。
-     *
      * 此方法从缓冲池中分配一个新页面，并初始化该页面的位图和头信息。
      * 更新文件头以反映新页面的添加，并设置新页面的编号和下一个空闲页面编号。
      *
@@ -180,8 +179,6 @@ public class RecordFileHandle {
      * @throws DBException 如果在创建新页面时发生数据库异常
      */
     public RecordPageHandle CreateNewPageHandle() throws DBException {
-        int newPageId = fileHeader.getNumberOfPages(); // 强制 pageId = 当前页面数量（即下一页）
-        PagePosition position = new PagePosition(filename, newPageId * Page.DEFAULT_PAGE_SIZE);
         Page newPage = bufferPool.NewPage(filename);
         RecordPageHandle pageHandle = new RecordPageHandle(fileHeader, newPage);
 
