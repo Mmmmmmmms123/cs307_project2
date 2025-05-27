@@ -1,5 +1,6 @@
 package edu.sustech.cs307.logicalOperator.dml;
 
+import edu.sustech.cs307.exception.ExceptionTypes;
 import edu.sustech.cs307.system.DBManager;
 import edu.sustech.cs307.exception.DBException;
 import edu.sustech.cs307.optimizer.LogicalPlanner;
@@ -7,6 +8,7 @@ import edu.sustech.cs307.logicalOperator.LogicalOperator;
 
 import net.sf.jsqlparser.statement.ExplainStatement;
 
+import net.sf.jsqlparser.statement.Statement;
 import org.pmw.tinylog.Logger;
 
 public class ExplainExecutor implements DMLExecutor {
@@ -19,8 +21,21 @@ public class ExplainExecutor implements DMLExecutor {
         this.dbManager = dbManager;
     }
 
+
+
     @Override
     public void execute() throws DBException {
-       //todo: finish this function here, and add log info
+        Statement stmtToExplain = explainStatement.getStatement();
+        LogicalOperator logicalPlan = LogicalPlanner.resolveAndPlan(dbManager, stmtToExplain.toString());
+
+        if (logicalPlan == null) {
+            throw new DBException(ExceptionTypes.NOT_SUPPORTED_OPERATION);
+        }
+
+        String planStr = logicalPlan.toString();
+
+        Logger.info(planStr);
     }
+
+
 }
