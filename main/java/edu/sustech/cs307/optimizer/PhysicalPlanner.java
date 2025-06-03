@@ -2,6 +2,7 @@ package edu.sustech.cs307.optimizer;
 
 import edu.sustech.cs307.exception.DBException;
 import edu.sustech.cs307.exception.ExceptionTypes;
+import edu.sustech.cs307.index.BPlusTreeIndex;
 import edu.sustech.cs307.logicalOperator.*;
 import edu.sustech.cs307.physicalOperator.*;
 import edu.sustech.cs307.system.DBManager;
@@ -9,11 +10,9 @@ import edu.sustech.cs307.value.Value;
 import edu.sustech.cs307.value.ValueType;
 import edu.sustech.cs307.meta.ColumnMeta;
 import edu.sustech.cs307.meta.TableMeta;
+import edu.sustech.cs307.physicalOperator.InMemoryIndexScanOperator;
 
-import net.sf.jsqlparser.expression.DoubleValue;
-import net.sf.jsqlparser.expression.Expression;
-import net.sf.jsqlparser.expression.LongValue;
-import net.sf.jsqlparser.expression.StringValue;
+import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
 import net.sf.jsqlparser.expression.operators.relational.ParenthesedExpressionList;
 import net.sf.jsqlparser.statement.select.Values;
@@ -39,6 +38,8 @@ public class PhysicalPlanner {
             return handleUpdate(dbManager, updateOperator);
         } else if (logicalOp instanceof LogicalDeleteOperator deleteOperator) {
             return handleDelete(dbManager,deleteOperator);
+        } else if (logicalOp instanceof LogicalSelectOperator selectOperator) {
+            return handleSelect(dbManager,selectOperator);
         } else {
             throw new DBException(ExceptionTypes.UnsupportedOperator(logicalOp.getClass().getSimpleName()));
         }
@@ -62,6 +63,9 @@ public class PhysicalPlanner {
             return new SeqScanOperator(tableName, dbManager);
         }
     }
+
+
+
 
     private static PhysicalOperator handleFilter(DBManager dbManager, LogicalFilterOperator logicalFilterOp)
             throws DBException {
@@ -204,4 +208,29 @@ public class PhysicalPlanner {
         // 创建物理删除操作符
         return new DeleteOperator(inputOp, logicalDeleteOp.getTableName(),logicalDeleteOp.getExpression());
     }
+
+    private static PhysicalOperator handleSelect(DBManager dbManager, LogicalSelectOperator logicalSelectOp) throws DBException {
+        // 获取子物理算子
+        PhysicalOperator child = generateOperator(dbManager, logicalSelectOp.getChild());
+
+        // 获取列名和值
+        String columnName = logicalSelectOp.getColumnName();
+        Expression expr = logicalSelectOp.getTargetValue();
+
+        // 将表达式转换为 Value
+        Value targetValue;
+
+        if (expr instanceof StringValue stringValue) {
+            targetValue = new Value(stringValue.getValue());
+        } else if (expr instanceof LongValue longValue) {
+            targetValue = new Value(longValue.getValue());
+        } else if (expr instanceof DoubleValue doubleValue) {
+            targetValue = new Value(doubleValue.getValue());
+        } else {
+            throw new DBException(ExceptionTypes.InvalidSQL("SELECT", "Unsupported expression type for select value"));
+        }
+
+        return new SelectOperator(child, columnName, targetValue, dbManager);
+    }
+
 }

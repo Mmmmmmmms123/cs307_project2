@@ -26,13 +26,13 @@ import edu.sustech.cs307.exception.DBException;
 public class LogicalPlanner {
     public static LogicalOperator resolveAndPlan(DBManager dbManager, String sql) throws DBException {
         JSqlParser parser = new CCJSqlParserManager();
-        Statement stmt = null;
+        Statement stmt ;
         try {
             stmt = parser.parse(new StringReader(sql));
         } catch (JSQLParserException e) {
             throw new DBException(ExceptionTypes.InvalidSQL(sql, e.getMessage()));
         }
-        LogicalOperator operator = null;
+        LogicalOperator operator ;
         // Query
         if (stmt instanceof Select selectStmt) {
             operator = handleSelect(dbManager, selectStmt);
@@ -42,36 +42,35 @@ public class LogicalPlanner {
             operator = handleUpdate(dbManager, updateStmt);
         }else if (stmt instanceof Delete deleteStmt){
             operator = handleDelete(dbManager,deleteStmt);
-        }
-        //todo: add condition of handleDelete
-        // functional
-        else if (stmt instanceof CreateTable createTableStmt) {
-            CreateTableExecutor createTable = new CreateTableExecutor(createTableStmt, dbManager, sql);
-            createTable.execute();
-            return null;
-        } else if (stmt instanceof ExplainStatement explainStatement) {
-            ExplainExecutor explainExecutor = new ExplainExecutor(explainStatement, dbManager);
-            explainExecutor.execute();
-            return null;
-        } else if (stmt instanceof ShowStatement showStatement) {
-            ShowDatabaseExecutor showDatabaseExecutor = new ShowDatabaseExecutor(showStatement);
-            showDatabaseExecutor.execute();
-            return null;
-        } else if (stmt instanceof Drop dropStatement) {
-            DropTableExecutor dropTableExecutor = new DropTableExecutor(dbManager,dropStatement);
-            dropTableExecutor.execute();
-            return null;
-        } else if (stmt instanceof DescribeStatement describeStatement){
-            DescTableExecutor descTableExecutor = new DescTableExecutor(dbManager,describeStatement);
-            descTableExecutor.execute();
-            return null;
-        } else if(stmt instanceof ShowTablesStatement showTablesStatement){
-            ShowTableExecutor showTableExecutor = new ShowTableExecutor(dbManager,showTablesStatement);
-            showTableExecutor.execute();
-            return null;
-        }
-        else {
-            throw new DBException(ExceptionTypes.UnsupportedCommand((stmt.toString())));
+        } else {
+            if (stmt instanceof CreateTable createTableStmt) {
+                CreateTableExecutor createTable = new CreateTableExecutor(createTableStmt, dbManager, sql);
+                createTable.execute();
+                return null;
+            } else if (stmt instanceof ExplainStatement explainStatement) {
+                ExplainExecutor explainExecutor = new ExplainExecutor(explainStatement, dbManager);
+                explainExecutor.execute();
+                return null;
+            } else if (stmt instanceof ShowStatement showStatement) {
+                ShowDatabaseExecutor showDatabaseExecutor = new ShowDatabaseExecutor(showStatement);
+                showDatabaseExecutor.execute();
+                return null;
+            } else if (stmt instanceof Drop dropStatement) {
+                DropTableExecutor dropTableExecutor = new DropTableExecutor(dbManager,dropStatement);
+                dropTableExecutor.execute();
+                return null;
+            } else if (stmt instanceof DescribeStatement describeStatement){
+                DescTableExecutor descTableExecutor = new DescTableExecutor(dbManager,describeStatement);
+                descTableExecutor.execute();
+                return null;
+            } else if(stmt instanceof ShowTablesStatement showTablesStatement){
+                ShowTableExecutor showTableExecutor = new ShowTableExecutor(dbManager,showTablesStatement);
+                showTableExecutor.execute();
+                return null;
+            }
+            else {
+                throw new DBException(ExceptionTypes.UnsupportedCommand((stmt.toString())));
+            }
         }
         return operator;
     }
@@ -82,8 +81,14 @@ public class LogicalPlanner {
         if (plainSelect.getFromItem() == null) {
             throw new DBException(ExceptionTypes.UnsupportedCommand((plainSelect.toString())));
         }
-        LogicalOperator root = new LogicalTableScanOperator(plainSelect.getFromItem().toString(), dbManager);
+        LogicalTableScanOperator scan = new LogicalTableScanOperator(plainSelect.getFromItem().toString(), dbManager);
 
+        // 提前设置 WHERE 条件用于选择索引扫描
+        if (plainSelect.getWhere() != null) {
+            scan.setWhereCondition(plainSelect.getWhere());
+        }
+
+        LogicalOperator root = scan;
         int depth = 0;
         //对join的设计
         if (plainSelect.getJoins() != null) {
@@ -105,6 +110,7 @@ public class LogicalPlanner {
         return root;
     }
 
+
     private static LogicalOperator handleInsert(DBManager dbManager, Insert insertStmt) {
         return new LogicalInsertOperator(insertStmt.getTable().getName(), insertStmt.getColumns(),
                 insertStmt.getValues());
@@ -121,6 +127,5 @@ public class LogicalPlanner {
         return new LogicalDeleteOperator(root, deleteStmt.getTable().getName(),
                 deleteStmt.getWhere());
     }
-
 
 }

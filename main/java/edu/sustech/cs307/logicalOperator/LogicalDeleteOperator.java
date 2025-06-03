@@ -23,6 +23,7 @@ public class LogicalDeleteOperator extends LogicalOperator {
 
     @Override
     public String toString() {
-        return "LogicalDeleteOperator(table=" + tableName + ")";
+        return "LogicalDeleteOperator(table=" + tableName + ", expression=" + expressions + ")\n ├── " + getChild();
     }
+
 }

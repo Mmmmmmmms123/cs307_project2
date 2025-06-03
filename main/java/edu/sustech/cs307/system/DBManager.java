@@ -3,6 +3,7 @@ package edu.sustech.cs307.system;
 import edu.sustech.cs307.DBEntry;
 import edu.sustech.cs307.exception.DBException;
 import edu.sustech.cs307.exception.ExceptionTypes;
+import edu.sustech.cs307.index.IndexManager;
 import edu.sustech.cs307.meta.ColumnMeta;
 import edu.sustech.cs307.meta.MetaManager;
 import edu.sustech.cs307.meta.TableMeta;
@@ -22,13 +23,14 @@ public class DBManager {
     private final DiskManager diskManager;
     private final BufferPool bufferPool;
     private final RecordManager recordManager;
-
+    private final IndexManager indexManager;
     public DBManager(DiskManager diskManager, BufferPool bufferPool, RecordManager recordManager,
-            MetaManager metaManager) {
+            MetaManager metaManager,IndexManager indexManager) {
         this.diskManager = diskManager;
         this.bufferPool = bufferPool;
         this.recordManager = recordManager;
         this.metaManager = metaManager;
+        this.indexManager=indexManager;
     }
 
     public BufferPool getBufferPool() {
@@ -46,6 +48,7 @@ public class DBManager {
     public MetaManager getMetaManager() {
         return metaManager;
     }
+    public IndexManager getIndexManager(){return indexManager;}
 
     public boolean isDirExists(String dir) {
         File file = new File(dir);
