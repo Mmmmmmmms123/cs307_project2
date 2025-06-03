@@ -1,6 +1,8 @@
 package edu.sustech.cs307;
 
 import edu.sustech.cs307.exception.DBException;
+import edu.sustech.cs307.index.Index;
+import edu.sustech.cs307.index.IndexManager;
 import edu.sustech.cs307.logicalOperator.LogicalOperator;
 import edu.sustech.cs307.meta.ColumnMeta;
 import edu.sustech.cs307.meta.MetaManager;
@@ -70,7 +72,28 @@ public class DBEntry {
             整合上述四个组件，创建统一的数据库管理器。
             DBManager 是系统对外暴露的主要接口，封装了对数据库的各种操作
              */
-            dbManager = new DBManager(diskManager, bufferPool, recordManager, metaManager);
+            IndexManager indexManager = new IndexManager() {
+                @Override
+                public Index getIndex(String tableName, String columnName) throws DBException {
+                    return null;
+                }
+
+                @Override
+                public void createIndex(String tableName, String columnName) throws DBException {
+
+                }
+
+                @Override
+                public void dropIndex(String tableName, String columnName) throws DBException {
+
+                }
+
+                @Override
+                public Map<String, Map<String, Index>> getAllIndexes() throws DBException {
+                    return null;
+                }
+            };
+            dbManager = new DBManager(diskManager, bufferPool, recordManager, metaManager,indexManager);
         } catch (DBException e) {
             Logger.error(e.getMessage());
             Logger.error("An error occurred during initializing. Exiting....");

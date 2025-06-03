@@ -122,7 +122,7 @@ public class UpdateOperator implements PhysicalOperator {
     @Override
     public ArrayList<ColumnMeta> outputSchema() {
         ArrayList<ColumnMeta> schema = new ArrayList<>();
-        schema.add(new ColumnMeta("update", "numberOfUpdatedRows", ValueType.INTEGER, 0, 0));
+        schema.add(new ColumnMeta("update", "numberOfUpdatedRows", ValueType.INTEGER, 0, 0,false,false,true));
         return schema;
     }
 
