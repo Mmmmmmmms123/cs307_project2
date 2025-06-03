@@ -28,27 +28,22 @@ public class ColumnMeta {
     @JsonProperty("isUnique")
     public boolean isUnique;
 
-    @JsonProperty("isNotNull")
-    public boolean isNotNull;
-
 
     @JsonCreator
     public ColumnMeta(@JsonProperty("tableName") String tableName,
                       @JsonProperty("name") String name,
                       @JsonProperty("type") ValueType type,
                       @JsonProperty("len") int len,
-                      @JsonProperty("offset") int offset,
-                      @JsonProperty("isPrimaryKey") boolean isPrimaryKey,
-                      @JsonProperty("isUnique") boolean isUnique,
-                      @JsonProperty("isNotNull") boolean isNotNull) {
+                      @JsonProperty("offset") int offset){
+//                      @JsonProperty("isPrimaryKey") boolean isPrimaryKey,
+//                      @JsonProperty("isUnique") boolean isUnique{
         this.tableName = tableName;
         this.name = name;
         this.type = type;
         this.len = len;
         this.offset = offset;
-        this.isPrimaryKey=isPrimaryKey;
-        this.isUnique=isUnique;
-        this.isNotNull=isNotNull;
+//        this.isPrimaryKey=isPrimaryKey;
+//        this.isUnique=isUnique;
     }
 
     public int getLen() {
@@ -66,7 +61,4 @@ public class ColumnMeta {
         return isUnique;
     }
 
-    public boolean isNotNull() {
-        return isNotNull;
-    }
 }

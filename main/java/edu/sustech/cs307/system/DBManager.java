@@ -23,14 +23,14 @@ public class DBManager {
     private final DiskManager diskManager;
     private final BufferPool bufferPool;
     private final RecordManager recordManager;
-    private final IndexManager indexManager;
+//    private final IndexManager indexManager;
     public DBManager(DiskManager diskManager, BufferPool bufferPool, RecordManager recordManager,
-            MetaManager metaManager,IndexManager indexManager) {
+            MetaManager metaManager) {
         this.diskManager = diskManager;
         this.bufferPool = bufferPool;
         this.recordManager = recordManager;
         this.metaManager = metaManager;
-        this.indexManager=indexManager;
+ //       this.indexManager=indexManager;
     }
 
     public BufferPool getBufferPool() {
@@ -48,7 +48,7 @@ public class DBManager {
     public MetaManager getMetaManager() {
         return metaManager;
     }
-    public IndexManager getIndexManager(){return indexManager;}
+ //   public IndexManager getIndexManager(){return indexManager;}
 
     public boolean isDirExists(String dir) {
         File file = new File(dir);

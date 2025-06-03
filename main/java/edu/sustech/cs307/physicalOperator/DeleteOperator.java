@@ -76,7 +76,7 @@ public class DeleteOperator implements PhysicalOperator {
     @Override
     public ArrayList<ColumnMeta> outputSchema() {
         ArrayList<ColumnMeta> schema = new ArrayList<>();
-        schema.add(new ColumnMeta("delete", "numberOfDeletedRows", ValueType.INTEGER, 0, 0,false,false,true));
+        schema.add(new ColumnMeta("delete", "numberOfDeletedRows", ValueType.INTEGER, 0, 0));
         return schema;
     }
 
